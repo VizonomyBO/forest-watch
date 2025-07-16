@@ -22,7 +22,7 @@ jobs:
         run: yarn install
 
       - name: Run tests
-        run: yarn run test:coverage
+        run: yarn run test
 
       # - name: Install DeepSource CLI
       #   run: curl https://deepsource.io/cli | sh
