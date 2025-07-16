@@ -1,0 +1,17 @@
+name: Production Deployment
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  run-pipeline:
+    name: Run pipeline
+    uses: ./.github/workflows/ci-pipeline.yml
+    secrets: inherit
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      environment: "production"
