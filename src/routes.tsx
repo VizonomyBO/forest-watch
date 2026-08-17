@@ -1,5 +1,5 @@
 import { FC, ReactNode, useEffect, useState } from "react";
-import { Route, Switch, Redirect, useLocation, useParams, useRouteMatch } from "react-router-dom";
+import { Route, Switch, Redirect, useLocation, useRouteMatch } from "react-router-dom";
 
 import Areas from "pages/areas/Areas";
 import AreasManage from "pages/area-view/AreaView";
@@ -22,33 +22,14 @@ import TemplateEdit from "pages/template-edit/TemplateEdit";
 import TemplateCreate from "pages/template-edit/TemplateCreate";
 import Help from "pages/help/Help";
 
-interface IParams {
-  token?: string;
-  confirmToken?: string;
-  callbackUrl?: string;
-}
-
 interface IProps {
   defaultComponent: () => ReactNode;
 }
 
 const LoginComponent = () => {
-  const location = useLocation();
-  const queryParams = useParams<IParams>();
-  const callbackUrl = queryParams.callbackUrl;
-  const confirmToken = queryParams.confirmToken;
   const user = useSelector((state: RootState) => state.user);
 
-  if (!user.loggedIn && queryParams.token && (callbackUrl || confirmToken)) {
-    return (
-      <Redirect
-        to={{
-          pathname: "/login",
-          search: location.search
-        }}
-      />
-    );
-  } else if (user.loggedIn) {
+  if (user.loggedIn) {
     return <Redirect to="/areas" />;
   } else {
     return <Login />;
@@ -60,7 +41,6 @@ const Routes: FC<IProps> = props => {
 
   const location = useLocation();
   const match = useRouteMatch();
-  const queryParams = useParams<IParams>();
   const user = useSelector((state: RootState) => state.user);
 
   const [route, setRoute] = useState({
@@ -98,11 +78,7 @@ const Routes: FC<IProps> = props => {
             path={`${match.url}forgotten-password`}
             render={args => <SignUpAndReset isResetPassword {...args} />}
           />
-          {/* After the user logs in with a social login they are redirected
-           *  to GFW with their JWT in a query param, then the page fetches
-           *  their info using the JWT. Without '!queryParams.token' the
-           *  login page would flicker while their info is being fetched */}
-          {!queryParams.token && <Route path="*" render={() => <Redirect to="/login" />} />}
+          <Route path="*" render={() => <Redirect to="/login" />} />
         </Switch>
       )}
       {user.loggedIn && (

@@ -11,11 +11,16 @@ import App from "components/app/AppContainer";
 import "./main.css";
 import "./index.scss";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { sanitizeTelemetryEvent } from "security/telemetry";
+import { clearLegacyPersistedUserState, persistenceConfig } from "security/storage";
+import "security/authCallback";
 
 /** Initialise Sentry */
 if (ENVIRONMENT !== "development") {
   Sentry.init({
-    dsn: SENTRY_DSN
+    dsn: SENTRY_DSN,
+    beforeSend: event => sanitizeTelemetryEvent(event),
+    beforeBreadcrumb: breadcrumb => sanitizeTelemetryEvent(breadcrumb)
   });
 }
 // Create a history of your choosing (we're using a browser history in this case)
@@ -25,10 +30,6 @@ const history = createBrowserHistory();
 function dispatch(action: any) {
   store.dispatch(action);
 }
-
-const persistConfig = {
-  whitelist: ["user", "app"]
-};
 
 const queryClient = new QueryClient();
 
@@ -46,7 +47,9 @@ function startApp() {
   );
 }
 
-persistStore(store, persistConfig, () => {
+clearLegacyPersistedUserState();
+
+persistStore(store, persistenceConfig, () => {
   startApp();
 });
 

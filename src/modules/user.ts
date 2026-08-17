@@ -1,4 +1,3 @@
-import querystring from "query-string";
 import { setUserChecked } from "./app";
 import { syncApp } from "./app";
 import { getTeamByUserId } from "./teams";
@@ -67,9 +66,13 @@ export default function reducer(state = initialState, action: TReducerActions) {
 // Action Creators
 export function checkLogged(tokenParam: string = "") {
   return (dispatch: AppDispatch, getState: () => RootState) => {
-    const queryParams = querystring.parse(tokenParam);
     const user = getState().user;
-    const token = queryParams.token || user.token;
+    const token = tokenParam || user.token;
+
+    if (!token) {
+      dispatch(setUserChecked());
+      return Promise.resolve();
+    }
 
     return userService
       .checkLogged(token)
@@ -81,14 +84,13 @@ export function checkLogged(tokenParam: string = "") {
         dispatch(setUserChecked());
         dispatch(syncApp());
       })
-      .catch(error => {
+      .catch(() => {
         if (user.loggedIn) {
           dispatch({
             type: LOGOUT
           });
         }
         dispatch(setUserChecked());
-        console.warn(error);
       });
   };
 }
@@ -102,9 +104,8 @@ export function confirmUser(token: string) {
         toastr.success("You have become a confirmed user", "");
         dispatch(getTeamByUserId(getState().user.data.id));
       })
-      .catch(error => {
+      .catch(() => {
         toastr.error("Error in confirmation", "");
-        console.warn(error);
       });
   };
 }

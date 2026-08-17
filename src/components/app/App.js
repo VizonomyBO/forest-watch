@@ -1,25 +1,27 @@
 import { Component } from "react";
 import PropTypes from "prop-types";
-import querystring from "query-string";
 import ReduxToastr from "react-redux-toastr";
 import { IntlProvider } from "react-intl";
 import translations from "locales/index.js";
-import { DEFAULT_LANGUAGE, GA_UA } from "constants/global";
-import ReactGA from "react-ga";
+import { DEFAULT_LANGUAGE } from "constants/global";
 import "react-redux-toastr/lib/css/react-redux-toastr.min.css";
 import Nav from "components/layouts/Nav";
 import Landing from "pages/landing/LandingContainer";
 import UserNameForm from "components/modals/UserNameForm";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorFallback from "components/modals/ErrorFallbackModal";
+import { consumeSensitiveAuthCallback } from "security/authCallback";
+import { initializeAnalytics, trackPage } from "security/analytics";
 
 // Pages
 import Routes from "routes";
 
 class App extends Component {
   UNSAFE_componentWillMount() {
-    this.props.checkLogged(this.props.location.search);
-    ReactGA.initialize(GA_UA); //Unique Google Analytics tracking number
+    const { token, confirmToken } = consumeSensitiveAuthCallback();
+    this.confirmToken = confirmToken;
+    this.props.checkLogged(token);
+    initializeAnalytics();
   }
 
   componentDidMount() {
@@ -29,9 +31,7 @@ class App extends Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     const { location } = nextProps;
-    const queryParams = querystring.parse(nextProps.location.search);
-    const confirmToken = queryParams.confirmToken;
-    if (nextProps.user.token !== this.props.user.token && confirmToken) {
+    if (nextProps.user.token !== this.props.user.token && this.confirmToken) {
       this.checkConfirmedUser(nextProps);
     }
     if (location.pathname !== this.props.location.pathname || location.search !== this.props.location.search) {
@@ -40,14 +40,15 @@ class App extends Component {
   }
 
   fireTracking = location => {
-    ReactGA.set({ page: location.pathname + location.search });
-    ReactGA.pageview(location.pathname + location.search);
+    trackPage(location);
   };
 
   checkConfirmedUser(props) {
-    const queryParams = querystring.parse(props.location.search);
-    const confirmToken = queryParams.confirmToken;
-    if (confirmToken && props.user.token) this.props.confirmUser(confirmToken);
+    if (this.confirmToken && props.user.token) {
+      const confirmToken = this.confirmToken;
+      this.confirmToken = undefined;
+      this.props.confirmUser(confirmToken);
+    }
   }
 
   render() {

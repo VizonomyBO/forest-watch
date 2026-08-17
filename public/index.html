@@ -4,6 +4,67 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <!--
+      This must remain the first executable script. Authentication callbacks
+      currently arrive with bearer credentials in the query string. Capture
+      only the values the app needs and replace the visible URL before any
+      analytics, error reporting, fonts, or other third-party request starts.
+    -->
+    <script>
+      (function (window) {
+        var sensitiveNames = {
+          token: "token",
+          confirmtoken: "confirmToken",
+          access_token: null,
+          refresh_token: null,
+          id_token: null,
+          code: null,
+          state: null
+        };
+        var callback = {};
+        var hadSensitiveParameters = false;
+
+        function sanitizeParameters(value) {
+          if (!value) return "";
+
+          return value.split("&").filter(function (part) {
+            var separatorIndex = part.indexOf("=");
+            var encodedName = separatorIndex >= 0 ? part.slice(0, separatorIndex) : part;
+            var encodedValue = separatorIndex >= 0 ? part.slice(separatorIndex + 1) : "";
+            var name;
+            var parameterValue;
+
+            try {
+              name = decodeURIComponent(encodedName.replace(/\+/g, " "));
+              parameterValue = decodeURIComponent(encodedValue.replace(/\+/g, " "));
+            } catch (error) {
+              return true;
+            }
+
+            var normalizedName = name.toLowerCase();
+            if (!Object.prototype.hasOwnProperty.call(sensitiveNames, normalizedName)) return true;
+
+            hadSensitiveParameters = true;
+            var callbackName = sensitiveNames[normalizedName];
+            if (callbackName && callback[callbackName] === undefined) callback[callbackName] = parameterValue;
+            return false;
+          }).join("&");
+        }
+
+        var sanitizedSearch = sanitizeParameters(window.location.search.slice(1));
+        var sanitizedHash = sanitizeParameters(window.location.hash.slice(1));
+
+        if (!hadSensitiveParameters) return;
+
+        callback.hadSensitiveParameters = true;
+        window.__FW_SENSITIVE_AUTH_CALLBACK__ = callback;
+        var sanitizedUrl = window.location.pathname +
+          (sanitizedSearch ? "?" + sanitizedSearch : "") +
+          (sanitizedHash ? "#" + sanitizedHash : "");
+        window.history.replaceState(window.history.state, document.title, sanitizedUrl);
+      })(window);
+    </script>
+
     <!-- favicon -->
     <link rel="shortcut icon" href="%PUBLIC_URL%/images/favicon/favicon.ico">
     <link rel="apple-touch-icon" sizes="57x57" href="%PUBLIC_URL%/images/favicon/apple-icon-57x57.png">
@@ -25,11 +86,15 @@
     <meta name="theme-color" content="#ffffff">
 
     <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-      })(window,document,'script','dataLayer','GTM-KLBN2T5');</script>
+    <script>
+      if (!window.__FW_SENSITIVE_AUTH_CALLBACK__) {
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','GTM-KLBN2T5');
+      }
+    </script>
     <!-- End Google Tag Manager -->
 
     <!-- main -->
@@ -41,10 +106,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500;700&display=swap" rel="stylesheet" crossorigin="anonymous">
   </head>
   <body>
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KLBN2T5"
-      height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-      <!-- End Google Tag Manager (noscript) -->
     <!------------------------------------------ICONS------------------------------------------->
     <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <defs>
