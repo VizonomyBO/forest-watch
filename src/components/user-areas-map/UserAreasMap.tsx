@@ -7,7 +7,6 @@ import * as turf from "@turf/turf";
 import { goToGeojson } from "helpers/map";
 import SquareClusterMarkers, { EPointDataTypes } from "components/ui/Map/components/layers/SquareClusterMarkers";
 import { Layer, Source } from "react-map-gl";
-import { PLANET_BASEMAP } from "constants/mapbox";
 import { IPlanetBasemap } from "helpers/basemap";
 import ReportDetailCard from "components/ui/Map/components/cards/ReportDetailContainer";
 import { getReportAlertsByName } from "helpers/reports";
@@ -15,6 +14,7 @@ import { TAnswer } from "components/ui/Map/components/cards/ReportDetail";
 import { ProcTypes } from "pages/reports/investigation/Investigation";
 import useGetAreas from "hooks/querys/areas/useGetAreas";
 import { IContext } from "pages/reports/investigation/MapContext";
+import { getPlanetTileUrl } from "services/basemap";
 
 export interface IProps extends IMapProps {
   // Should be a memorised function! useCallBack()
@@ -89,7 +89,7 @@ const UserAreasMap: FC<PropsWithChildren<IProps>> = props => {
 
   const planetBasemapUrl = useMemo(() => {
     if (currentPlanetBasemap) {
-      return PLANET_BASEMAP.url.replace("{name}", currentPlanetBasemap.name).replace("{proc}", currentProc);
+      return getPlanetTileUrl(currentPlanetBasemap.name, currentProc);
     }
     return null;
   }, [currentPlanetBasemap, currentProc]);

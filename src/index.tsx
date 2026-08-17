@@ -1,8 +1,6 @@
 import store from "store";
-// @ts-nocheck (Error on Router)
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
-import { createBrowserHistory } from "history";
 import { persistStore } from "redux-persist";
 import * as Sentry from "@sentry/browser";
 import { BrowserRouter as Router } from "react-router-dom";
@@ -14,6 +12,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { sanitizeTelemetryEvent } from "security/telemetry";
 import { clearLegacyPersistedUserState, persistenceConfig } from "security/storage";
 import "security/authCallback";
+import { LOGOUT } from "modules/user";
+import { setAuthTokenProvider, setUnauthorizedHandler } from "services/httpClient";
 
 /** Initialise Sentry */
 if (ENVIRONMENT !== "development") {
@@ -23,15 +23,15 @@ if (ENVIRONMENT !== "development") {
     beforeBreadcrumb: breadcrumb => sanitizeTelemetryEvent(breadcrumb)
   });
 }
-// Create a history of your choosing (we're using a browser history in this case)
-const history = createBrowserHistory();
-
 // Export dispatch function for dispatching actions outside connect
 function dispatch(action: any) {
   store.dispatch(action);
 }
 
 const queryClient = new QueryClient();
+
+setUnauthorizedHandler(() => store.dispatch({ type: LOGOUT }));
+setAuthTokenProvider(() => store.getState().user.token);
 
 function startApp() {
   const container = document.getElementById("app");
@@ -53,4 +53,4 @@ persistStore(store, persistenceConfig, () => {
   startApp();
 });
 
-export { store, history, dispatch };
+export { store, dispatch };

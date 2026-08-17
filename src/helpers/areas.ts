@@ -2,12 +2,11 @@ import { AREAS } from "../constants/map";
 import { RootState } from "store";
 import { TAreasInTeam, TAreasResponse } from "services/area";
 import { TeamResponse } from "services/teams";
-
-const geojsonArea = require("@mapbox/geojson-area");
+import { geometry as calculateGeometryArea } from "@mapbox/geojson-area";
 
 // check area size on draw complete
 const checkArea = (area: any) => {
-  const areaSize = geojsonArea.geometry(area.geometry);
+  const areaSize = calculateGeometryArea(area.geometry);
   if (areaSize <= AREAS.maxSize) {
     return true;
   }

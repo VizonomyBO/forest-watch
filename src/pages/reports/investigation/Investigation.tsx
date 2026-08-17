@@ -19,7 +19,7 @@ import OptionalWrapper from "components/extensive/OptionalWrapper";
 import MapCard from "components/ui/Map/components/cards/MapCard";
 
 //@ts-ignore
-import breakpoints from "styles/utilities/_u-breakpoints.scss";
+import { MOBILE_BREAKPOINT } from "constants/layout";
 import { useGetV3ContextualLayer } from "generated/clayers/clayersComponents";
 import { useAccessToken } from "hooks/useAccessToken";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -83,7 +83,7 @@ const InvestigationPage: FC<IProps> = props => {
   const [showComparison, setShowComparison] = useState(false);
   let selectedAreaMatch = useRouteMatch<TParams>({ path: "/reporting/investigation/:areaId", exact: false });
   let investigationMatch = useRouteMatch<TParams>({ path: "/reporting/investigation/:areaId/start", exact: false });
-  const isMobile = useMediaQuery({ maxWidth: breakpoints.mobile });
+  const isMobile = useMediaQuery({ maxWidth: MOBILE_BREAKPOINT });
   const [controlsPortal, setControlsPortal] = useState<HTMLElement | undefined>(undefined);
   const [dateStrs, setDateStrs] = useState<{ beforeStr: string; afterStr: string }>();
   const intl = useIntl();

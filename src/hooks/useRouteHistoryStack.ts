@@ -1,5 +1,5 @@
 import { ROUTER_HISTORY_PUSH } from "modules/routeStackHistory";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { useHistory, useLocation } from "react-router-dom";
 
@@ -8,11 +8,15 @@ export const useRouteHistoryStack = () => {
   const history = useHistory<any>();
   const dispatch = useDispatch();
   const location = useLocation();
-  history.listen((location, action) => dispatch({ type: `routeHistory/${action}`, payload: location }));
+  const initialLocation = useRef(location);
 
   useEffect(() => {
-    //Add initial route into history
-    dispatch({ type: ROUTER_HISTORY_PUSH, payload: location });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    dispatch({ type: ROUTER_HISTORY_PUSH, payload: initialLocation.current });
+
+    const unlisten = history.listen((nextLocation, action) =>
+      dispatch({ type: `routeHistory/${action}`, payload: nextLocation })
+    );
+
+    return unlisten;
+  }, [dispatch, history]);
 };

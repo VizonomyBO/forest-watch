@@ -8,7 +8,77 @@ provider "aws" {
 }
 
 locals {
-  name = "${var.project_name}-${var.environment}-web"
+  name                    = "${var.project_name}-${var.environment}-web"
+  content_security_policy = join("; ", [
+    "default-src 'self'",
+    "base-uri 'self'",
+    "object-src 'none'",
+    "frame-ancestors 'none'",
+    "form-action 'self'",
+    "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://maps.googleapis.com https://maps.gstatic.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://maps.googleapis.com",
+    "font-src 'self' data: https://fonts.gstatic.com",
+    "img-src 'self' data: blob: https:",
+    "connect-src 'self' https: wss:",
+    "worker-src 'self' blob:",
+    "child-src 'self' blob:",
+    "frame-src https://www.googletagmanager.com",
+    "manifest-src 'self'",
+    "media-src 'self' blob:",
+    "upgrade-insecure-requests"
+  ])
+}
+
+resource "aws_cloudfront_response_headers_policy" "security" {
+  name = "${local.name}-security-headers"
+
+  security_headers_config {
+    content_security_policy {
+      content_security_policy = local.content_security_policy
+      override                = true
+    }
+
+    content_type_options {
+      override = true
+    }
+
+    frame_options {
+      frame_option = "DENY"
+      override     = true
+    }
+
+    referrer_policy {
+      referrer_policy = "strict-origin-when-cross-origin"
+      override        = true
+    }
+
+    strict_transport_security {
+      access_control_max_age_sec = 31536000
+      include_subdomains         = true
+      preload                    = true
+      override                   = true
+    }
+  }
+
+  custom_headers_config {
+    items {
+      header   = "Permissions-Policy"
+      value    = "camera=(), geolocation=(), microphone=(), payment=(), usb=()"
+      override = true
+    }
+
+    items {
+      header   = "Cross-Origin-Opener-Policy"
+      value    = "same-origin"
+      override = true
+    }
+
+    items {
+      header   = "X-Permitted-Cross-Domain-Policies"
+      value    = "none"
+      override = true
+    }
+  }
 }
 
 resource "aws_s3_bucket" "main" {
@@ -110,10 +180,11 @@ resource "aws_cloudfront_distribution" "main" {
   aliases = var.app_urls
 
   default_cache_behavior {
-    target_origin_id = local.name
-    allowed_methods  = ["GET", "HEAD"]
-    cached_methods   = ["GET", "HEAD"]
-    compress         = true
+    target_origin_id           = local.name
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.security.id
+    allowed_methods            = ["GET", "HEAD"]
+    cached_methods             = ["GET", "HEAD"]
+    compress                   = true
 
     forwarded_values {
       query_string = false

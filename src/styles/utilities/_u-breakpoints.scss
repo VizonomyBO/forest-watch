@@ -30,5 +30,3 @@ $grid-breakpoints: (
     @content;
   }
 }
-
-:export { mobile: map-get($grid-breakpoints, md) };

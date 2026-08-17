@@ -18,6 +18,7 @@ import yup from "configureYup";
 import { FormattedMessage, useIntl } from "react-intl";
 import ReactDOM from "react-dom";
 import OptionalWrapper from "components/extensive/OptionalWrapper";
+import { MAPBOX_ACCESS_TOKEN } from "constants/global";
 
 interface IProps extends HTMLAttributes<HTMLElement> {
   countriesOptions?: Array<{
@@ -77,7 +78,7 @@ const MapControls: FC<IProps> = props => {
   const geocoder = useMemo(() => {
     if (map) {
       return new MapboxGeocoder({
-        accessToken: process.env.REACT_APP_MAPBOX_ACCESS_TOKEN as string,
+        accessToken: MAPBOX_ACCESS_TOKEN as string,
         marker: false
       });
     }

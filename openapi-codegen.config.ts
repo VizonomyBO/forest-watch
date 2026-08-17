@@ -1,10 +1,21 @@
 import { generateSchemaTypes, generateReactQueryComponents } from "@openapi-codegen/typescript";
 import { defineConfig } from "@openapi-codegen/cli";
+
+const schemaUrl = (repository: string, filename: string) => {
+  const refVariable = `OPENAPI_${repository.toUpperCase()}_REF`;
+  const schemaRef = process.env[refVariable];
+  if (!schemaRef || !/^[a-f0-9]{40}$/i.test(schemaRef)) {
+    throw new Error(`${refVariable} must be an immutable 40-character Git commit SHA`);
+  }
+
+  return `https://raw.githubusercontent.com/wri/${repository}/${schemaRef}/docs/${filename}`;
+};
+
 export default defineConfig({
   api: {
     from: {
       source: "url",
-      url: "https://raw.githubusercontent.com/wri/fw_api/dev/docs/fw_api.yaml"
+      url: schemaUrl("fw_api", "fw_api.yaml")
     },
     outputDir: "src/generated/api",
     to: async context => {
@@ -21,7 +32,7 @@ export default defineConfig({
   alerts: {
     from: {
       source: "url",
-      url: "https://raw.githubusercontent.com/wri/fw_alerts/dev/docs/fw_alerts.yaml"
+      url: schemaUrl("fw_alerts", "fw_alerts.yaml")
     },
     outputDir: "src/generated/alerts",
     to: async context => {
@@ -38,7 +49,7 @@ export default defineConfig({
   teams: {
     from: {
       source: "url",
-      url: "https://raw.githubusercontent.com/wri/fw_teams/dev/docs/fw_teams.yaml"
+      url: schemaUrl("fw_teams", "fw_teams.yaml")
     },
     outputDir: "src/generated/teams",
     to: async context => {
@@ -55,7 +66,7 @@ export default defineConfig({
   exports: {
     from: {
       source: "url",
-      url: "https://raw.githubusercontent.com/wri/fw_exports/dev/docs/fw_exports.yaml"
+      url: schemaUrl("fw_exports", "fw_exports.yaml")
     },
     outputDir: "src/generated/exports",
     to: async context => {
@@ -72,7 +83,7 @@ export default defineConfig({
   forms: {
     from: {
       source: "url",
-      url: "https://raw.githubusercontent.com/wri/fw_forms/dev/docs/fw_forms.yaml"
+      url: schemaUrl("fw_forms", "fw_forms.yaml")
     },
     outputDir: "src/generated/forms",
     to: async context => {
@@ -89,7 +100,7 @@ export default defineConfig({
   core: {
     from: {
       source: "url",
-      url: "https://raw.githubusercontent.com/wri/fw_core/dev/docs/fw_core.yaml"
+      url: schemaUrl("fw_core", "fw_core.yaml")
     },
     outputDir: "src/generated/core",
     to: async context => {
@@ -106,7 +117,7 @@ export default defineConfig({
   users: {
     from: {
       source: "url",
-      url: "https://raw.githubusercontent.com/wri/fw_users/dev/docs/fw_users.yaml"
+      url: schemaUrl("fw_users", "fw_users.yaml")
     },
     outputDir: "src/generated/users",
     to: async context => {
@@ -123,7 +134,7 @@ export default defineConfig({
   clayers: {
     from: {
       source: "url",
-      url: "https://raw.githubusercontent.com/wri/fw_contextual_layers/dev/docs/fw_contextual_layers.yaml"
+      url: schemaUrl("fw_contextual_layers", "fw_contextual_layers.yaml")
     },
     outputDir: "src/generated/clayers",
     to: async context => {

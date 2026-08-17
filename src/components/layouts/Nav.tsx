@@ -14,7 +14,7 @@ import { Popover } from "@headlessui/react";
 import { FC } from "react";
 import { useForm, UseFormReturn } from "react-hook-form";
 //@ts-ignore
-import breakpoints from "styles/utilities/_u-breakpoints.scss";
+import { MOBILE_BREAKPOINT } from "constants/layout";
 import OptionalWrapper from "components/extensive/OptionalWrapper";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -45,7 +45,7 @@ interface INavLinks {
 
 const NavLinks: FC<INavLinks> = ({ loggedIn, formHook, languages, user, logout, onLinkSelect }) => {
   const { register } = formHook;
-  const isMobile = useMediaQuery({ maxWidth: breakpoints.mobile });
+  const isMobile = useMediaQuery({ maxWidth: MOBILE_BREAKPOINT });
   const queryClient = useQueryClient();
 
   return (
@@ -197,7 +197,7 @@ const Nav: FC<IProps> = props => {
   const { watch } = formhook;
   const intl = useIntl();
   const localeValue = watch("localeSelect");
-  const isMobile = useMediaQuery({ maxWidth: breakpoints.mobile });
+  const isMobile = useMediaQuery({ maxWidth: MOBILE_BREAKPOINT });
 
   useEffect(() => {
     if (localeValue) {

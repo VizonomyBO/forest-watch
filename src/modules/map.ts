@@ -48,11 +48,14 @@ export function getPlanetBasemaps() {
       .then(data => {
         dispatch({
           type: SET_PLANET_BASEMAPS,
-          payload: getFriendlyPlanetBasemaps(data.mosaics)
+          payload: getFriendlyPlanetBasemaps(data.mosaics) || []
         });
       })
-      .catch(error => {
-        console.warn(error);
+      .catch(() => {
+        dispatch({
+          type: SET_PLANET_BASEMAPS,
+          payload: []
+        });
       });
   };
 }

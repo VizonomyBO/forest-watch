@@ -9,7 +9,7 @@ describe("authentication callback bootstrap", () => {
   });
 
   it("removes credentials from the visible URL before the GTM loader", () => {
-    const html = fs.readFileSync(path.join(process.cwd(), "public", "index.html"), "utf8");
+    const html = fs.readFileSync(path.join(process.cwd(), "index.html"), "utf8");
     const bootstrap = html.match(
       /<!--\s*This must remain the first executable script[\s\S]*?-->\s*<script>([\s\S]*?)<\/script>/
     );

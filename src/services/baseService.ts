@@ -1,3 +1,5 @@
+import { httpRequest, parseHttpResponse } from "./httpClient";
+
 export class BaseService {
   _token = "";
   baseUrl = "";
@@ -8,34 +10,23 @@ export class BaseService {
   }
 
   fetch = async (url: string, config?: RequestInit | undefined) => {
-    const headers = config?.headers || {};
-
-    return fetch(`${this.baseUrl}${url}`, {
+    const response = await httpRequest(`${this.baseUrl}${url}`, {
       ...config,
-      headers: {
-        Authorization: `Bearer ${this.token}`,
-        ...headers
-      }
+      token: this.token || undefined
     });
+    this._response = response;
+    return response;
   };
 
-  fetchJSON = async (url: string, config?: RequestInit | undefined) => {
+  fetchJSON = async <T = any>(url: string, config?: RequestInit | undefined): Promise<T> => {
     const response = await this.fetch(url, config);
 
-    this._response = response;
-
-    if (!response.ok) {
-      throw Error(await response.text());
-    }
-    return response.json();
+    return parseHttpResponse<T>(response);
   };
 
   fetchBlob = async (url: string, config?: RequestInit | undefined) => {
     const response = await this.fetch(url, config);
 
-    this._response = response;
-
-    if (!response.ok) throw Error(await response.text());
     return response.blob();
   };
 

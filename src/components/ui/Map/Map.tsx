@@ -10,6 +10,7 @@ import { editStyles } from "./components/layers/styles";
 import { FeatureCollection } from "geojson";
 import OptionalWrapper from "components/extensive/OptionalWrapper";
 import { BASEMAPS } from "constants/mapbox";
+import { MAPBOX_ACCESS_TOKEN } from "constants/global";
 
 export interface IMapViewState {
   longitude: number;
@@ -99,6 +100,7 @@ const Map: FC<IProps> = props => {
   const mapElement = (
     <ReactMap
       {...actualViewState}
+      mapboxAccessToken={MAPBOX_ACCESS_TOKEN}
       onMove={evt => (setMapViewState ? setMapViewState(evt.viewState) : setViewState(evt.viewState))}
       mapStyle={mapStyle}
       onLoad={handleMapLoad}

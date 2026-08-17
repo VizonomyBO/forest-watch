@@ -3,21 +3,19 @@ export const API_VIZZUALITY_URL_V1 = process.env.REACT_APP_API_VIZZUALITY_URL_V1
 export const API_BASE_URL_V1 = process.env.REACT_APP_API_CUBE_URL_V1;
 export const API_BASE_URL_V3 = process.env.REACT_APP_API_CUBE_URL_V3;
 export const ALERTS_API_URL = process.env.REACT_APP_ALERTS_API_URL;
-export const ALERTS_API_TOKEN = process.env.REACT_APP_ALERTS_API_TOKEN;
 export const API_BASE_AUTH_URL = process.env.REACT_APP_API_AUTH_URL;
 export const CARTO_URL = process.env.REACT_APP_CARTO;
 export const CARTO_TABLE = process.env.REACT_APP_CARTO_TABLE;
 export const API_CALLBACK_URL = process.env.REACT_APP_API_AUTH_CALLBACK_URL;
 export const CARTO_COUNTRIES = process.env.REACT_APP_CARTO_COUNTRIES;
-export const GFW_API_KEY = process.env.REACT_APP_GFW_API_KEY;
 export const TWITTER_WIDGET_API = process.env.REACT_APP_TWITTER_WIDGET_API;
 export const FACEBOOK_WIDGET_API = process.env.REACT_APP_FACEBOOK_WIDGET_API;
 export const GA_UA = process.env.REACT_APP_GA_UA;
 export const SENTRY_DSN = process.env.REACT_APP_SENTRY_DSN;
 export const ENVIRONMENT = process.env.NODE_ENV;
-export const GOOGLE_PLACES_API_KEY = process.env.REACT_APP_GOOGLE_PLACES_API_KEY;
-export const API_BITLY_TOKEN = process.env.REACT_APP_API_BITLY_TOKEN;
-export const API_BITLY_BASE_URL = process.env.REACT_APP_API_BITLY_BASE_URL || "https://api-ssl.bitly.com/v4";
+export const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_PUBLIC_MAPBOX_ACCESS_TOKEN;
+export const GOOGLE_PLACES_API_KEY = process.env.REACT_APP_PUBLIC_GOOGLE_PLACES_API_KEY;
+export const INTEGRATIONS_API_PATH = process.env.REACT_APP_INTEGRATIONS_API_PATH || "";
 export const DEFAULT_TEMPLATE_ID = process.env.REACT_APP_DEFAULT_TEMPLATE_ID || "";
 
 // constants
@@ -43,10 +41,10 @@ const Globals = {
   CARTO_COUNTRIES,
   MAX_NUMBER_OF_LAYERS,
   TABLE_PAGE_SIZE,
-  GFW_API_KEY,
   TWITTER_WIDGET_API,
   FACEBOOK_WIDGET_API,
   GA_UA,
+  MAPBOX_ACCESS_TOKEN,
   GOOGLE_PLACES_API_KEY,
   MY_GFW_LINK
 };

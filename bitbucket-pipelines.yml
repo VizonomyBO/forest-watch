@@ -2,31 +2,40 @@ pipelines:
   definitions:
     - step: &install_and_test
         name: Install and run tests
-        image: node:16.14.0
+        image: node:24
         caches:
           - node
         script:
-          - yarn install
-          - yarn test
+          - corepack enable
+          - corepack prepare yarn@1.22.22 --activate
+          - yarn install --frozen-lockfile
+          - yarn verify
+          - yarn audit:dependencies
     - step: &build
         name: Build Project
-        image: node:16.14.0
+        image: node:24
         deployment: test
         caches:
           - node
         artifacts:
           - build/**
         script:
+          - corepack enable
+          - corepack prepare yarn@1.22.22 --activate
+          - yarn install --frozen-lockfile
           - yarn build
     - step: &build_storybook
         size: 2x
         name: Build Storybook
-        image: node:16.14.0
+        image: node:24
         caches:
           - node
         artifacts:
           - storybook-static/**
         script:
+          - corepack enable
+          - corepack prepare yarn@1.22.22 --activate
+          - yarn install --frozen-lockfile
           - yarn build-storybook
     - step: &deploy_test
         name: Deploy to develop
@@ -53,17 +62,17 @@ pipelines:
           - aws s3 sync . s3://forest-watcher-web-client-staging
           - aws cloudfront create-invalidation --distribution-id E3UEJWTVPP1UFQ --paths "/*"
   pull-requests:
-    '**':
+    "**":
       - step: *install_and_test
       - parallel:
-        - step: *build
-        - step: *build_storybook
+          - step: *build
+          - step: *build_storybook
   branches:
     develop:
       - step: *install_and_test
       - parallel:
-        - step: *build
-        - step: *build_storybook
+          - step: *build
+          - step: *build_storybook
       - step: *deploy_test
     master:
       - step: *install_and_test

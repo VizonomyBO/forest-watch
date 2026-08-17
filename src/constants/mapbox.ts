@@ -24,7 +24,5 @@ export const BASEMAPS = {
 export const PLANET_BASEMAP = {
   key: "maps.planet",
   style: "mapbox://styles/mapbox/dark-v11",
-  image: MapPlanetImage,
-  url: `https://tiles.planet.com/basemaps/v1/planet-tiles/{name}/gmap/{z}/{x}/{y}.png?proc={proc}&api_key=${process.env.REACT_APP_PLANET_API_KEY}`
-  // url: "https://globalforestwatch.org/api/planet-tiles/{name}/gmap/{z}/{x}/{y}/?proc="
-}; // Look at using https://tiles.planet.com/basemaps/v1/planet-tiles/
+  image: MapPlanetImage
+};

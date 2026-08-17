@@ -8,7 +8,6 @@ import { useIntl } from "react-intl";
 import { UnpackNestedValue } from "react-hook-form";
 import { download } from "helpers/exports";
 import LinkPreview from "components/ui/LinkPreview/LinkPreview";
-import { bitlyService } from "services/bitly";
 
 export type TExportForm = {
   fileType: string;
@@ -148,12 +147,12 @@ const ExportModal: FC<IProps> = ({ onClose, onSave, isOpen, fileTypes, fields, d
     onClose?.();
   };
 
-  const generateShortenedLink = async (resp: UnpackNestedValue<TExportForm>) => {
+  const generateShareableLink = async (resp: UnpackNestedValue<TExportForm>) => {
     setIsReportURLLoading(true);
-    const saveResp = await onSave(resp);
-    if (saveResp) {
-      const shorten = await bitlyService.shorten(saveResp);
-      setReportUrl(shorten.link);
+    try {
+      const saveResp = await onSave(resp);
+      if (saveResp) setReportUrl(saveResp);
+    } finally {
       setIsReportURLLoading(false);
     }
   };
@@ -189,7 +188,7 @@ const ExportModal: FC<IProps> = ({ onClose, onSave, isOpen, fileTypes, fields, d
         }
 
         if (changes[0] === "link" && !!values.fileType && (await exportSchema.isValid(values))) {
-          generateShortenedLink(values);
+          generateShareableLink(values);
         }
       }}
     >

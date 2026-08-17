@@ -8,7 +8,7 @@ class Tip extends PureComponent {
   render() {
     const { text, html, className } = this.props;
     if (html) {
-      return <div className={cx('c-tip', className)} dangerouslySetInnerHTML={{__html: html}} /> // eslint-disable-line
+      return <div className={cx("c-tip", className)} dangerouslySetInnerHTML={{ __html: html }} />; // eslint-disable-line
     }
     return <div className={cx("c-tip", className)}>{text}</div>;
   }

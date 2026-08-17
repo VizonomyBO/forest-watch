@@ -1,4 +1,4 @@
-import { BaseService } from "./baseService";
+import { INTEGRATIONS_API_PATH } from "constants/global";
 
 interface ILinks {
   _self: string;
@@ -28,10 +28,47 @@ export interface IMosaic {
   quad_download: boolean;
 }
 
-export class ReportService extends BaseService {
-  getPlanetBasemaps() {
-    return this.fetchJSON(`/mosaics?api_key=${process.env.REACT_APP_PLANET_API_KEY}&_page_size=1000`);
+export interface IMosaicsResponse {
+  mosaics: IMosaic[];
+}
+
+export function normalizeIntegrationsApiPath(path: string | undefined): string {
+  if (!path || !path.startsWith("/") || path.startsWith("//")) return "";
+  return path.replace(/\/+$/, "");
+}
+
+export function getPlanetTileUrl(name: string, proc: string, apiPath = INTEGRATIONS_API_PATH): string | null {
+  const basePath = normalizeIntegrationsApiPath(apiPath);
+  if (!basePath) return null;
+
+  const query = proc ? `?proc=${encodeURIComponent(proc)}` : "";
+  return `${basePath}/planet/tiles/${encodeURIComponent(name)}/gmap/{z}/{x}/{y}.png${query}`;
+}
+
+export class BasemapService {
+  private readonly apiPath: string;
+
+  constructor(apiPath = INTEGRATIONS_API_PATH) {
+    this.apiPath = normalizeIntegrationsApiPath(apiPath);
+  }
+
+  get isConfigured() {
+    return Boolean(this.apiPath);
+  }
+
+  async getPlanetBasemaps(): Promise<IMosaicsResponse> {
+    if (!this.apiPath) return { mosaics: [] };
+
+    const response = await fetch(`${this.apiPath}/planet/mosaics?pageSize=1000`, {
+      credentials: "same-origin",
+      headers: {
+        Accept: "application/json"
+      }
+    });
+
+    if (!response.ok) throw Error("Unable to load Planet basemaps through the integrations API");
+    return response.json();
   }
 }
 
-export const basemapService = new ReportService(`https://api.planet.com/basemaps/v1`);
+export const basemapService = new BasemapService();
